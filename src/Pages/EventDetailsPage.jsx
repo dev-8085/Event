@@ -41,6 +41,13 @@ export default function EventDetailsPage() {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [showAllReviews, setShowAllReviews] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const event = events.find(e => e.id === id);
 
@@ -326,13 +333,14 @@ export default function EventDetailsPage() {
       });
     } else {
       navigator.clipboard.writeText(window.location.href);
+      alert('Link copied to clipboard!');
     }
   };
 
   if (!event) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black flex items-center justify-center">
-        <div className="text-center text-white">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black flex items-center justify-center px-4">
+        <div className="text-center text-white max-w-md w-full">
           <div className="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-3xl">❌</span>
           </div>
@@ -340,7 +348,7 @@ export default function EventDetailsPage() {
           <p className="text-gray-400 mb-6">The event you're looking for doesn't exist.</p>
           <Link 
             to="/"
-            className="bg-blue-600 text-white px-6 py-3 rounded-2xl font-semibold hover:bg-blue-700 transition-colors"
+            className="bg-blue-600 text-white px-6 py-3 rounded-2xl font-semibold hover:bg-blue-700 transition-colors inline-block"
           >
             Back to Events
           </Link>
@@ -365,20 +373,20 @@ export default function EventDetailsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
       {/* Navigation */}
-      <div className="relative z-10 p-6">
+      <div className="relative z-10 p-4 sm:p-6">
         <button
           onClick={() => navigate(-1)}
           className="flex items-center gap-2 text-white/80 hover:text-white transition-colors duration-200 bg-black/30 backdrop-blur-sm px-4 py-2 rounded-2xl"
         >
           <ArrowLeft className="w-5 h-5" />
-          Back
+          <span className="sr-only sm:not-sr-only">Back</span>
         </button>
       </div>
 
       {/* Hero Section */}
       <div className="relative">
         {/* Main Image */}
-        <div className="relative h-[70vh] overflow-hidden">
+        <div className="relative h-[50vh] sm:h-[60vh] md:h-[70vh] overflow-hidden">
           <img 
             src={eventExtras.gallery[selectedImageIndex]} 
             alt={event.title}
@@ -387,12 +395,12 @@ export default function EventDetailsPage() {
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
           
           {/* Image Gallery Thumbnails */}
-          <div className="absolute bottom-6 left-6 flex gap-2">
+          <div className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 flex gap-2">
             {eventExtras.gallery.map((img, index) => (
               <button
                 key={index}
                 onClick={() => setSelectedImageIndex(index)}
-                className={`w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
+                className={`w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
                   selectedImageIndex === index ? 'border-white scale-110' : 'border-white/30 hover:border-white/60'
                 }`}
               >
@@ -402,46 +410,46 @@ export default function EventDetailsPage() {
           </div>
 
           {/* Action Buttons */}
-          <div className="absolute top-6 right-6 flex gap-3">
+          <div className="absolute top-4 right-4 sm:top-6 sm:right-6 flex gap-2 sm:gap-3">
             <button
               onClick={() => setIsLiked(!isLiked)}
-              className={`p-3 rounded-full backdrop-blur-sm transition-all duration-200 ${
+              className={`p-2 sm:p-3 rounded-full backdrop-blur-sm transition-all duration-200 ${
                 isLiked ? 'bg-red-500 text-white' : 'bg-black/30 text-white/80 hover:bg-black/50'
               }`}
             >
-              <Heart className={`w-6 h-6 ${isLiked ? 'fill-current' : ''}`} />
+              <Heart className={`w-5 h-5 sm:w-6 sm:h-6 ${isLiked ? 'fill-current' : ''}`} />
             </button>
             <button
               onClick={handleShare}
-              className="p-3 rounded-full bg-black/30 backdrop-blur-sm text-white/80 hover:bg-black/50 hover:text-white transition-all duration-200"
+              className="p-2 sm:p-3 rounded-full bg-black/30 backdrop-blur-sm text-white/80 hover:bg-black/50 hover:text-white transition-all duration-200"
             >
-              <Share2 className="w-6 h-6" />
+              <Share2 className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
           </div>
 
           {/* Event Title Overlay */}
-          <div className="absolute bottom-8 left-8 right-8">
-            <div className="flex flex-wrap gap-2 mb-4">
-              {eventExtras.tags.map((tag, index) => (
+          <div className="absolute bottom-6 left-4 right-4 sm:bottom-8 sm:left-8 sm:right-8">
+            <div className="flex flex-wrap gap-2 mb-3 sm:mb-4">
+              {eventExtras.tags.slice(0, windowWidth < 640 ? 2 : eventExtras.tags.length).map((tag, index) => (
                 <span
                   key={index}
-                  className="px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-sm rounded-full border border-white/30"
+                  className="px-2 py-1 text-xs sm:text-sm sm:px-3 bg-white/20 backdrop-blur-sm text-white rounded-full border border-white/30"
                 >
                   {tag}
                 </span>
               ))}
             </div>
-            <h1 className="text-5xl font-bold text-white mb-4 leading-tight">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 sm:mb-4 leading-tight">
               {event.title}
             </h1>
-            <div className="flex items-center gap-6 text-white/90">
+            <div className="flex flex-wrap items-center gap-3 sm:gap-6 text-white/90 text-sm sm:text-base">
               <div className="flex items-center gap-2">
-                <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                <Star className="w-4 h-4 sm:w-5 sm:h-5 fill-yellow-400 text-yellow-400" />
                 <span className="font-semibold">{averageRating.toFixed(1)}</span>
                 <span className="text-white/70">({eventExtras.reviews.length} reviews)</span>
               </div>
               <div className="flex items-center gap-2">
-                <Users className="w-5 h-5" />
+                <Users className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span>250+ attending</span>
               </div>
             </div>
@@ -450,62 +458,62 @@ export default function EventDetailsPage() {
       </div>
 
       {/* Content Section */}
-      <div className="relative z-10 -mt-20 bg-white rounded-t-[3rem] min-h-screen">
-        <div className="p-8 pt-12">
+      <div className="relative z-10 -mt-12 sm:-mt-16 md:-mt-20 bg-white rounded-t-[2rem] sm:rounded-t-[3rem] min-h-screen">
+        <div className="p-4 sm:p-6 md:p-8 pt-8 sm:pt-10 md:pt-12">
           <div className="max-w-6xl mx-auto">
-            <div className="grid lg:grid-cols-3 gap-8">
+            <div className="grid lg:grid-cols-3 gap-6 sm:gap-8">
               {/* Main Content */}
-              <div className="lg:col-span-2 space-y-8">
+              <div className="lg:col-span-2 space-y-6 sm:space-y-8">
                 {/* Event Info */}
-                <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-3xl p-8 border border-blue-100">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
-                    <Info className="w-6 h-6 text-blue-600" />
+                <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-blue-100">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center gap-3">
+                    <Info className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
                     Event Details
                   </h2>
                   
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center">
-                          <Calendar className="w-6 h-6 text-blue-600" />
+                  <div className="grid md:grid-cols-2 gap-4 sm:gap-6">
+                    <div className="space-y-3 sm:space-y-4">
+                      <div className="flex items-center gap-3 sm:gap-4">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-xl sm:rounded-2xl flex items-center justify-center">
+                          <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
                         </div>
                         <div>
-                          <p className="text-sm text-gray-600">Date</p>
-                          <p className="font-semibold text-gray-800">{dateInfo.weekday}</p>
-                          <p className="font-bold text-lg text-gray-800">{dateInfo.month} {dateInfo.day}, {dateInfo.year}</p>
+                          <p className="text-xs sm:text-sm text-gray-600">Date</p>
+                          <p className="font-semibold text-sm sm:text-base text-gray-800">{dateInfo.weekday}</p>
+                          <p className="font-bold text-base sm:text-lg text-gray-800">{dateInfo.month} {dateInfo.day}, {dateInfo.year}</p>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center">
-                          <Clock className="w-6 h-6 text-green-600" />
+                      <div className="flex items-center gap-3 sm:gap-4">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-xl sm:rounded-2xl flex items-center justify-center">
+                          <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
                         </div>
                         <div>
-                          <p className="text-sm text-gray-600">Time</p>
-                          <p className="font-bold text-lg text-gray-800">9:00 AM - 6:00 PM</p>
+                          <p className="text-xs sm:text-sm text-gray-600">Time</p>
+                          <p className="font-bold text-base sm:text-lg text-gray-800">9:00 AM - 6:00 PM</p>
                         </div>
                       </div>
                     </div>
 
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center">
-                          <MapPin className="w-6 h-6 text-red-600" />
+                    <div className="space-y-3 sm:space-y-4">
+                      <div className="flex items-center gap-3 sm:gap-4">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-red-100 rounded-xl sm:rounded-2xl flex items-center justify-center">
+                          <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
                         </div>
                         <div>
-                          <p className="text-sm text-gray-600">Location</p>
-                          <p className="font-bold text-lg text-gray-800">{event.location}</p>
-                          <p className="text-sm text-gray-600">Get directions</p>
+                          <p className="text-xs sm:text-sm text-gray-600">Location</p>
+                          <p className="font-bold text-base sm:text-lg text-gray-800">{event.location}</p>
+                          <p className="text-xs sm:text-sm text-gray-600">Get directions</p>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-purple-100 rounded-2xl flex items-center justify-center">
-                          <Ticket className="w-6 h-6 text-purple-600" />
+                      <div className="flex items-center gap-3 sm:gap-4">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-xl sm:rounded-2xl flex items-center justify-center">
+                          <Ticket className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
                         </div>
                         <div>
-                          <p className="text-sm text-gray-600">Price</p>
-                          <p className="font-bold text-2xl text-purple-600">₹{event.price || '2500'}</p>
+                          <p className="text-xs sm:text-sm text-gray-600">Price</p>
+                          <p className="font-bold text-xl sm:text-2xl text-purple-600">₹{event.price || '2500'}</p>
                         </div>
                       </div>
                     </div>
@@ -513,81 +521,81 @@ export default function EventDetailsPage() {
                 </div>
 
                 {/* Description */}
-                <div className="bg-white rounded-3xl p-8 shadow-lg border border-gray-100">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-4">About This Event</h2>
-                  <p className="text-gray-600 leading-relaxed text-lg">
+                <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-lg border border-gray-100">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-3 sm:mb-4">About This Event</h2>
+                  <p className="text-gray-600 leading-relaxed text-base sm:text-lg">
                     {event.description}
                   </p>
                 </div>
 
                 {/* Highlights */}
-                <div className="bg-gradient-to-r from-green-50 to-teal-50 rounded-3xl p-8 border border-green-100">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-6">Event Highlights</h2>
-                  <div className="grid md:grid-cols-2 gap-4">
+                <div className="bg-gradient-to-r from-green-50 to-teal-50 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-green-100">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6">Event Highlights</h2>
+                  <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
                     {eventExtras.highlights.map((highlight, index) => (
-                      <div key={index} className="flex items-center gap-3">
-                        <CheckCircle className="w-5 h-5 text-green-600" />
-                        <span className="text-gray-700">{highlight}</span>
+                      <div key={index} className="flex items-center gap-2 sm:gap-3">
+                        <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
+                        <span className="text-sm sm:text-base text-gray-700">{highlight}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
                 {/* Amenities */}
-                <div className="bg-white rounded-3xl p-8 shadow-lg border border-gray-100">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-6">Amenities & Services</h2>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-lg border border-gray-100">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6">Amenities & Services</h2>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                     {eventExtras.amenities.map((amenity, index) => (
                       <div
                         key={index}
-                        className={`p-4 rounded-2xl text-center transition-all duration-200 ${
+                        className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl text-center transition-all duration-200 ${
                           amenity.available
                             ? 'bg-green-50 text-green-700 border border-green-200'
                             : 'bg-gray-50 text-gray-400 border border-gray-200'
                         }`}
                       >
-                        <amenity.icon className="w-8 h-8 mx-auto mb-2" />
-                        <p className="text-sm font-semibold">{amenity.label}</p>
+                        <amenity.icon className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-1 sm:mb-2" />
+                        <p className="text-xs sm:text-sm font-semibold">{amenity.label}</p>
                       </div>
                     ))}
                   </div>
                 </div>
 
                 {/* Reviews */}
-                <div className="bg-white rounded-3xl p-8 shadow-lg border border-gray-100">
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-bold text-gray-800">Reviews</h2>
+                <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-lg border border-gray-100">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 gap-3">
+                    <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Reviews</h2>
                     <div className="flex items-center gap-2">
-                      <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                      <Star className="w-4 h-4 sm:w-5 sm:h-5 fill-yellow-400 text-yellow-400" />
                       <span className="font-bold text-lg">{averageRating.toFixed(1)}</span>
                       <span className="text-gray-600">({eventExtras.reviews.length} reviews)</span>
                     </div>
                   </div>
 
-                  <div className="space-y-6">
+                  <div className="space-y-4 sm:space-y-6">
                     {eventExtras.reviews.slice(0, showAllReviews ? eventExtras.reviews.length : 2).map((review) => (
-                      <div key={review.id} className="flex gap-4">
+                      <div key={review.id} className="flex gap-3 sm:gap-4">
                         <img
                           src={review.avatar}
                           alt={review.user}
-                          className="w-12 h-12 rounded-full object-cover"
+                          className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover"
                         />
                         <div className="flex-1">
-                          <div className="flex items-center justify-between mb-2">
-                            <h4 className="font-semibold text-gray-800">{review.user}</h4>
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-1 sm:mb-2 gap-1">
+                            <h4 className="font-semibold text-sm sm:text-base text-gray-800">{review.user}</h4>
                             <div className="flex items-center gap-1">
                               {[...Array(5)].map((_, i) => (
                                 <Star
                                   key={i}
-                                  className={`w-4 h-4 ${
+                                  className={`w-3 h-3 sm:w-4 sm:h-4 ${
                                     i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
                                   }`}
                                 />
                               ))}
                             </div>
                           </div>
-                          <p className="text-gray-600 mb-2">{review.comment}</p>
-                          <p className="text-sm text-gray-500">{review.date}</p>
+                          <p className="text-sm text-gray-600 mb-1 sm:mb-2">{review.comment}</p>
+                          <p className="text-xs text-gray-500">{review.date}</p>
                         </div>
                       </div>
                     ))}
@@ -596,7 +604,7 @@ export default function EventDetailsPage() {
                   {eventExtras.reviews.length > 2 && (
                     <button
                       onClick={() => setShowAllReviews(!showAllReviews)}
-                      className="mt-4 text-blue-600 hover:text-blue-700 font-semibold"
+                      className="mt-3 sm:mt-4 text-blue-600 hover:text-blue-700 font-semibold text-sm sm:text-base"
                     >
                       {showAllReviews ? 'Show Less' : 'Show All Reviews'}
                     </button>
@@ -605,24 +613,24 @@ export default function EventDetailsPage() {
               </div>
 
               {/* Sidebar */}
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 {/* Booking Card */}
-                <div className="bg-gradient-to-br from-blue-600 to-purple-600 rounded-3xl p-8 text-white sticky top-8">
-                  <div className="text-center mb-6">
-                    <p className="text-blue-100 mb-2">Starting from</p>
-                    <p className="text-4xl font-bold">₹{event.price || '2500'}</p>
-                    <p className="text-blue-100">per person</p>
+                <div className="bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 text-white sticky top-4 sm:top-8">
+                  <div className="text-center mb-4 sm:mb-6">
+                    <p className="text-blue-100 text-sm sm:text-base mb-1 sm:mb-2">Starting from</p>
+                    <p className="text-3xl sm:text-4xl font-bold">₹{event.price || '2500'}</p>
+                    <p className="text-blue-100 text-sm sm:text-base">per person</p>
                   </div>
 
                   <Link
                     to={`/book/${event.id}`}
-                    className="w-full bg-white text-gray-800 py-4 rounded-2xl font-bold text-lg hover:bg-gray-100 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl flex items-center justify-center gap-2 mb-4"
+                    className="w-full bg-white text-gray-800 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg hover:bg-gray-100 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg sm:hover:shadow-xl flex items-center justify-center gap-2 mb-3 sm:mb-4"
                   >
-                    <Ticket className="w-5 h-5" />
+                    <Ticket className="w-4 h-4 sm:w-5 sm:h-5" />
                     Register Now
                   </Link>
 
-                  <div className="text-center text-blue-100 text-sm">
+                  <div className="text-center text-blue-100 text-xs sm:text-sm space-y-1">
                     <p>✅ Instant confirmation</p>
                     <p>✅ Free cancellation up to 24h</p>
                     <p>✅ Mobile tickets accepted</p>
@@ -630,49 +638,49 @@ export default function EventDetailsPage() {
                 </div>
 
                 {/* Organizer Info */}
-                <div className="bg-white rounded-3xl p-6 shadow-lg border border-gray-100">
-                  <h3 className="font-bold text-gray-800 mb-4">Event Organizer</h3>
-                  <div className="flex items-center gap-4 mb-4">
+                <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-lg border border-gray-100">
+                  <h3 className="font-bold text-gray-800 text-base sm:text-lg mb-3 sm:mb-4">Event Organizer</h3>
+                  <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
                     <img
                       src={eventExtras.organizer.avatar}
                       alt={eventExtras.organizer.name}
-                      className="w-12 h-12 rounded-full object-cover"
+                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover"
                     />
                     <div>
-                      <div className="flex items-center gap-2">
-                        <h4 className="font-semibold text-gray-800">{eventExtras.organizer.name}</h4>
+                      <div className="flex items-center gap-1 sm:gap-2">
+                        <h4 className="font-semibold text-sm sm:text-base text-gray-800">{eventExtras.organizer.name}</h4>
                         {eventExtras.organizer.verified && (
-                          <Shield className="w-4 h-4 text-blue-600" />
+                          <Shield className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600" />
                         )}
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                      <div className="flex items-center gap-1 text-xs sm:text-sm text-gray-600">
+                        <Star className="w-3 h-3 sm:w-4 sm:h-4 fill-yellow-400 text-yellow-400" />
                         <span>{eventExtras.organizer.rating}</span>
                         <span>•</span>
                         <span>{eventExtras.organizer.events} events</span>
                       </div>
                     </div>
                   </div>
-                  <button className="w-full py-3 border-2 border-gray-200 text-gray-700 rounded-2xl hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
-                    <MessageCircle className="w-5 h-5" />
+                  <button className="w-full py-2 sm:py-3 border border-gray-200 sm:border-2 text-gray-700 rounded-xl sm:rounded-2xl hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 text-sm sm:text-base">
+                    <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
                     Contact Organizer
                   </button>
                 </div>
 
                 {/* Social Proof */}
-                <div className="bg-gradient-to-r from-green-50 to-teal-50 rounded-3xl p-6 border border-green-100">
+                <div className="bg-gradient-to-r from-green-50 to-teal-50 rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-green-100">
                   <div className="text-center">
-                    <div className="flex justify-center -space-x-2 mb-4">
+                    <div className="flex justify-center -space-x-2 mb-3 sm:mb-4">
                       {[...Array(5)].map((_, i) => (
                         <img
                           key={i}
                           src={`https://images.unsplash.com/photo-${1494790108755 + i}-2616b9f1a5ec?w=40`}
                           alt=""
-                          className="w-8 h-8 rounded-full border-2 border-white object-cover"
+                          className="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-white object-cover"
                         />
                       ))}
                     </div>
-                    <p className="text-sm text-gray-600 mb-2">
+                    <p className="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">
                       <span className="font-semibold text-green-600">250+ people</span> are registered
                     </p>
                     <p className="text-xs text-gray-500">Join them for an amazing learning experience!</p>
