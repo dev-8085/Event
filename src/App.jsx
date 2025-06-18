@@ -1,8 +1,9 @@
+import React from "react";          
 import { Routes, Route } from "react-router-dom";
-import HomePage from "./pages/HomePage";
-import EventDetailsPage from "./pages/EventDetailsPage";
-import BookingFormPage from "./pages/BookingFormPage";
-import ConfirmationPage from "./pages/ConfirmationPage";
+import HomePage from "./Pages/HomePage";
+import EventDetailsPage from "./Pages/EventDetailsPage";
+import BookingFormPage from "./Pages/BookingFormPage";
+import ConfirmationPage from "./Pages/ConfirmationPage";
 
 export default function App() {
   return (
